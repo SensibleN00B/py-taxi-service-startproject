@@ -9,6 +9,10 @@ class Driver(AbstractUser):
     def __str__(self) -> str:
         return f"{self.first_name} {self.last_name}"
 
+    class Meta:
+        ordering = ["last_name"]
+        verbose_name = "driver"
+
 
 class Manufacturer(models.Model):
     name = models.CharField(max_length=63, unique=True)
@@ -17,11 +21,24 @@ class Manufacturer(models.Model):
     def __str__(self) -> str:
         return self.name
 
+    class Meta:
+        ordering = ["name"]
+
 
 class Car(models.Model):
     model = models.CharField(max_length=255)
-    manufacturer = models.ForeignKey(Manufacturer, on_delete=models.CASCADE)
-    drivers = models.ManyToManyField(settings.AUTH_USER_MODEL)
+    manufacturer = models.ForeignKey(
+        Manufacturer, on_delete=models.CASCADE,
+        related_name="cars"
+    )
+    drivers = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name="cars",
+        blank=True,
+    )
+
+    class Meta:
+        ordering = ["model"]
 
     def __str__(self) -> str:
         return f"{self.model} (Manufacturer: {self.manufacturer})"
